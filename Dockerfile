@@ -14,4 +14,4 @@ RUN pip install -r /app/requirements.txt --user
 COPY ./app /app
 
 RUN python -m unittest -v 
-ENTRYPOINT python python_news.py
+ENTRYPOINT python news.py

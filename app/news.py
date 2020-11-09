@@ -1,7 +1,8 @@
 #!/usr/bin/python
 from features import data
 from features import notification
-from os.path import join, dirname
+from path import join, dirname
+from os import getenv
 from dotenv import load_dotenv
 
 def main():
@@ -11,9 +12,9 @@ def main():
     users = users_import._import()
 
     for user in users:
-        email = user.split(',')[0]
-        language = user.split(',')[1]
-        country = user.split(',')[2]
+        email = user[0]
+        language = user[1]
+        country = user[2]
         news = data.RetrieveData(
             api_key = NEWS_API_KEY,
             language = language,
@@ -29,7 +30,7 @@ def main():
             SMTPPort = SMTP_PORT,
             SMTPUsername = SMTP_USERNAME,
             SMTPPassword = SMTP_PASSWORD,
-            recipient = email
+            recipient = email,
             message = data_news
         )
         mail.send()
@@ -37,9 +38,9 @@ def main():
 if __name__ == "__main__":
     dotenv_path = join(dirname(__file__), './datas/.env')
     load_dotenv(dotenv_path)
-    NEWS_API_KEY = os.getenv('news_api_key')
-    SMTP_SERVER = os.getenv('smtp_server')
-    SMTP_PORT = os.getenv('smtp_port')
-    SMTP_USERNAME = os.getenv('smtp_username')
-    SMTP_PASSWORD = os.getenv('smtp_password')
+    NEWS_API_KEY = getenv('news_api_key')
+    SMTP_SERVER = getenv('smtp_server')
+    SMTP_PORT = getenv('smtp_port')
+    SMTP_USERNAME = getenv('smtp_username')
+    SMTP_PASSWORD = getenv('smtp_password')
     main()
