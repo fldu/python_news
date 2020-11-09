@@ -1,5 +1,8 @@
 #!/usr/bin/python
 import smtplib, ssl
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+import time
 import logging
 
 logging.basicConfig(level=logging.INFO, filename='debug.log', format='%(asctime)s - %(levelname)s - %(message)s', datefmt='%y-%m-%dT%H:%M:%S%z')
@@ -22,12 +25,18 @@ class MailNotification:
         self.message = message
 
     def send(self):
-        ssl_context = ssl.create_default_context()
         try:
-            server = smtplib.SMTP(self.SMTPServer, self.SMTPPort)
-            server.starttls(context=ssl_context)
+            server = smtplib.SMTP(self.SMTPServer, int(self.SMTPPort))
+            server.starttls()
             server.login(self.SMTPUsername, self.SMTPPassword)
-            server.sendmail(self.SMTPUsername, self.recipient, self.message)
+            msg = MIMEMultipart()
+            msg["From"] = self.SMTPUsername
+            msg["To"] = self.recipient
+            today = time.strftime("%A %d %B %Y")
+            msg["Subject"] = f"News {today}"
+            msg.attach(MIMEText(self.message, 'text'))
+            server.send_message(msg)
+            server.quit()
         except Exception as e:
-            logging.debug(f"Unable to send email: {e}")
+            logging.warning(f"Error in sending email: {e}")
             return False

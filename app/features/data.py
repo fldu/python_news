@@ -90,9 +90,9 @@ class PrepareNotification:
         self.message = message
 
     def run(self):
-        today = time.strftime("%A %B %Y")
-        output = f"Subject: News {today}\n\n"
+        output = ""
         for elem in self.message:
+            output += "**********"
             output += f"{elem}\n"
         output += "**********"
         return output

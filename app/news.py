@@ -1,7 +1,7 @@
 #!/usr/bin/python
 from features import data
 from features import notification
-from path import join, dirname
+from os.path import join, dirname
 from os import getenv
 from dotenv import load_dotenv
 
