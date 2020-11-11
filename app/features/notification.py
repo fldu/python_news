@@ -34,7 +34,7 @@ class MailNotification:
             msg["To"] = self.recipient
             today = time.strftime("%A %d %B %Y")
             msg["Subject"] = f"News {today}"
-            msg.attach(MIMEText(self.message, 'text'))
+            msg.attach(MIMEText(self.message, 'html'))
             server.send_message(msg)
             server.quit()
         except Exception as e:

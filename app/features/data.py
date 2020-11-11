@@ -49,10 +49,14 @@ class RetrieveData:
                         country = self.country
                     )
                     headlines = headlines['articles']
-                    output = ""
+                    news = []
                     for art in headlines:
-                        output += f"Title: {art['title']}\nDescription: {art['description']}\nURL: {art['url']}\n -----\n"
-                    return output
+                        news.append([art['title'],art['description'],art['url'], art['urlToImage']])
+                    dict_news = {
+                        'module_title': "News",
+                        'data': news
+                    }
+                    return dict_news
                 except Exception as e:
                     logging.warning(f"Exception in downloading the news: {e}")
                     return False
@@ -68,11 +72,11 @@ class RetrieveData:
                 facts = soup.find_all('ul')[1].text
                 facts = facts.split('\n')
                 chosen_facts = random.choices(facts, k=5)
-                output = ""
-                for fact in chosen_facts:
-                    output += f"{fact}\n"
-                output += " -----"
-                return output
+                dict_facts = {
+                    'module_title': 'Fun facts of the day',
+                    'data': chosen_facts
+                }
+                return dict_facts
             except Exception as e:
                 logging.warning(f"Exception in retrieving wikipedia page: {e}")
                 return False
@@ -90,9 +94,54 @@ class PrepareNotification:
         self.message = message
 
     def run(self):
+        #Greetings
+        today = time.strftime("%A %d %B %Y")
         output = ""
-        for elem in self.message:
-            output += "**********"
-            output += f"{elem}\n"
-        output += "**********"
+        output += """
+<html>
+<head>
+        <style>
+            body{
+                background: #ededed;
+                margin: 0 auto;
+            }
+            .listing {
+            padding: 0;
+            margin: 0;
+            width: 100%;
+            border-bottom: 0;
+            }
+            .listing li{
+                width: 100%;
+                float: none;
+                border: none;
+                margin: 2px;
+                padding: 10px;
+                text-align: left;
+                height: 120px;
+            }
+        </style>
+</head>
+        """
+        output += f"<body><h2>Good morning, today is {today}</h2>"
+        #News module here
+        title = self.message[0]['module_title']
+        data = self.message[0]['data']
+        output += f'<h2> {title}: </h2><ul class=listing style="list-style: none">'
+        for elem in data:
+            news_title = elem[0]
+            news_desc = elem[1]
+            news_link = elem[2]
+            news_img = elem[3]
+            output += f'<li><img style="float: left;" src="{news_img}" alt="image" height="100" /> <a style="margin-left: 5px;" href={news_link}>{news_title}</a><p style="margin-left: 5px;">{news_desc}</p></li>'
+        output += "</ul>"
+        #Wikipedia fact
+        title = self.message[1]['module_title']
+        data = self.message[1]['data']
+        output += f"<h2> {title}: </h2>"
+        for elem in data:
+            output += f'<p style="margin-left: 5px;">{elem}</p>'
+        #Wish a good day
+        output += "<h2>Have a good day!<h2>"
+        output += "</html>"
         return output
